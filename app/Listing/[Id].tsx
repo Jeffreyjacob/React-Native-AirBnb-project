@@ -1,24 +1,87 @@
-import { View, Text, StyleSheet, Dimensions, Image, TouchableOpacity } from 'react-native'
-import React from 'react'
-import { useLocalSearchParams } from 'expo-router';
+import { View, Text, StyleSheet, Dimensions, Image, TouchableOpacity, Share } from 'react-native'
+import React, { useLayoutEffect } from 'react'
+import { useLocalSearchParams, useNavigation } from 'expo-router';
 import listingData from '@/assets/data/airbnb-listings@public (4).json';
-import Animated, { SlideInDown } from 'react-native-reanimated';
+import Animated, { SlideInDown, interpolate, useAnimatedRef, useAnimatedStyle, useScrollViewOffset } from 'react-native-reanimated';
 import Colors from '@/constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
 import { defaultStyles } from '@/constants/styles';
 
 const Page = () => {
-    const {Id} = useLocalSearchParams<{Id:string}>();
-    const listing = (listingData as any[]).find((item) => item.id === Id)
-    const {width} =  Dimensions.get('window')
+  const { Id } = useLocalSearchParams<{ Id: string }>();
+  const listing = (listingData as any[]).find((item) => item.id === Id)
+  const { width } = Dimensions.get('window')
+  const scrollRef = useAnimatedRef<Animated.ScrollView>();
+  const scrollOffset = useScrollViewOffset(scrollRef)
+  const IMG_HEIGHT = 300
+  const navigation = useNavigation()
+
+  const imageAnimatedStyle = useAnimatedStyle(()=>{
+    return{
+      transform:[
+        {
+          translateY:interpolate(
+            scrollOffset.value,
+            [-IMG_HEIGHT,0,IMG_HEIGHT],
+            [-IMG_HEIGHT/2,0,IMG_HEIGHT * 0.75]
+          ),
+        },
+        {
+          scale:interpolate(
+            scrollOffset.value,[-IMG_HEIGHT,0,IMG_HEIGHT],[2,1,1]
+          )
+        }
+      ]
+    }
+  })
+  const shareListing = async()=>{
+     try{
+       await Share.share({
+        title:listing.name,
+        url:listing?.listing_url
+       })
+     }catch(err){
+      console.log(err)
+     }
+  }
+  const headerAnimatedStyle = useAnimatedStyle(()=>{
+    return {
+      opacity:interpolate(scrollOffset.value,[0,IMG_HEIGHT / 1.5],[0,1]),
+    }
+  })
+
+  useLayoutEffect(() => {
+   navigation.setOptions({
+    headerBackground:()=>(
+      <Animated.View style={[headerAnimatedStyle,styles.header]}/>
+    ),
+    headerRight:()=>(
+      <View style={styles.bar}>
+       <TouchableOpacity style={styles.roundButton} onPress={shareListing}>
+         <Ionicons name='share-outline' size={22} color='black'/>
+       </TouchableOpacity>
+       <TouchableOpacity style={styles.roundButton}>
+        <Ionicons name='heart-outline' size={22} color='black'/>
+       </TouchableOpacity>
+      </View>
+    ),
+    headerLeft:()=>(
+      <TouchableOpacity style={styles.roundButton} onPress={()=>navigation.goBack()}>
+         <Ionicons name='chevron-back' size={24} color='black'/>
+      </TouchableOpacity>
+    )
+   })
+  }, [])
 
   return (
     <View style={styles.container}>
-      <Animated.ScrollView>
-        <Animated.Image source={{uri:listing.xl_picture_url}}
-         style={{height:300,width}}/>
+      <Animated.ScrollView ref={scrollRef} 
+      scrollEventThrottle={16}
+      contentContainerStyle={{paddingBottom:100}}>
+        <Animated.Image source={{ uri: listing.xl_picture_url }}
+          style={[{ height:IMG_HEIGHT, width },imageAnimatedStyle]} />
 
-<View style={styles.infoContainer}>
+        <View style={styles.infoContainer}>
           <Text style={styles.name}>{listing.name}</Text>
           <Text style={styles.location}>
             {listing.room_type} in {listing.smart_location}
@@ -49,12 +112,12 @@ const Page = () => {
           <Text style={styles.description}>{listing.description}</Text>
         </View>
       </Animated.ScrollView>
-      
+
       <Animated.View style={defaultStyles.footer} entering={SlideInDown.delay(200)}>
         <View
           style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
           <TouchableOpacity style={styles.footerText}>
-            <Text style={styles.footerPrice}>€{listing.price}</Text>
+            <Text style={styles.footerPrice}>€ {listing.price}</Text>
             <Text>night</Text>
           </TouchableOpacity>
 
@@ -69,89 +132,89 @@ const Page = () => {
 }
 
 const styles = StyleSheet.create({
-    container:{
-      flex:1,
-      backgroundColor:'#fff',
-    },
-    infoContainer: {
-      padding: 24,
-      backgroundColor: '#fff',
-    },
-    name: {
-      fontSize: 26,
-      fontWeight: 'bold',
-      fontFamily: 'MonSb',
-    },
-    location: {
-      fontSize: 18,
-      marginTop: 10,
-      fontFamily: 'MonSb',
-    },
-    rooms: {
-      fontSize: 16,
-      color: Colors.grey,
-      marginVertical: 4,
-      fontFamily: 'Mon',
-    },
-    ratings: {
-      fontSize: 16,
-      fontFamily: 'MonSb',
-    },
-    divider: {
-      height: StyleSheet.hairlineWidth,
-      backgroundColor: Colors.grey,
-      marginVertical: 16,
-    },
-    host: {
-      width: 50,
-      height: 50,
-      borderRadius: 50,
-      backgroundColor: Colors.grey,
-    },
-    hostView: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 12,
-    },
-    footerText: {
-      height: '100%',
-      justifyContent: 'center',
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 4,
-    },
-    footerPrice: {
-      fontSize: 18,
-      fontFamily: 'MonSb',
-    },
-    roundButton: {
-      width: 40,
-      height: 40,
-      borderRadius: 50,
-      backgroundColor: 'white',
-      alignItems: 'center',
-      justifyContent: 'center',
-      color: Colors.primary,
-    },
-    bar: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: 10,
-    },
-    header: {
-      backgroundColor: '#fff',
-      height: 100,
-      borderBottomWidth: StyleSheet.hairlineWidth,
-      borderColor: Colors.grey,
-    },
-  
-    description: {
-      fontSize: 16,
-      marginTop: 10,
-      fontFamily: 'Mon',
-    },
-  
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  infoContainer: {
+    padding: 24,
+    backgroundColor: '#fff',
+  },
+  name: {
+    fontSize: 26,
+    fontWeight: 'bold',
+    fontFamily: 'MonSb',
+  },
+  location: {
+    fontSize: 18,
+    marginTop: 10,
+    fontFamily: 'MonSb',
+  },
+  rooms: {
+    fontSize: 16,
+    color: Colors.grey,
+    marginVertical: 4,
+    fontFamily: 'Mon',
+  },
+  ratings: {
+    fontSize: 16,
+    fontFamily: 'MonSb',
+  },
+  divider: {
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: Colors.grey,
+    marginVertical: 16,
+  },
+  host: {
+    width: 50,
+    height: 50,
+    borderRadius: 50,
+    backgroundColor: Colors.grey,
+  },
+  hostView: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  footerText: {
+    height: '100%',
+    justifyContent: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  footerPrice: {
+    fontSize: 18,
+    fontFamily: 'MonSb',
+  },
+  roundButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 50,
+    backgroundColor: 'white',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: Colors.primary,
+  },
+  bar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+  },
+  header: {
+    backgroundColor: '#fff',
+    height: 100,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderColor: Colors.grey,
+  },
+
+  description: {
+    fontSize: 16,
+    marginTop: 10,
+    fontFamily: 'Mon',
+  },
+
 })
 
 export default Page

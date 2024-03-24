@@ -48,7 +48,7 @@ const Listing = ({listings:items,category}:Props) => {
                 <Text style={{fontFamily:'Mon'}}>{item.room_type}</Text>
 
                 <View style={{flexDirection:'row',gap:4}}>
-                   <Text style={{fontFamily:'MonSb'}}>$ {item.price}</Text>
+                   <Text style={{fontFamily:'MonSb'}}>€ {item.price}</Text>
                    <Text style={{fontFamily:'Mon'}}>night</Text>
                 </View>
 
