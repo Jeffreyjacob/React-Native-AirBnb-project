@@ -9,6 +9,7 @@ import { TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as SecureStore from 'expo-secure-store';
 import { ClerkProvider, useAuth } from '@clerk/clerk-expo';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const ClERK_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY
 
@@ -84,6 +85,7 @@ function RootLayoutNav() {
   },[isLoaded])
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <GestureHandlerRootView style={{flex:1}}>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name='(modals)/login'
@@ -112,6 +114,8 @@ function RootLayoutNav() {
             )
         }}/>
       </Stack>
-    </ThemeProvider>
+
+      </GestureHandlerRootView>
+         </ThemeProvider>
   );
 }

@@ -3,6 +3,7 @@ import React from 'react'
 import  { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { useNavigation, useRouter } from 'expo-router';
 import MapView from 'react-native-map-clustering';
+import { defaultStyles } from '@/constants/styles';
 
 interface Props{
   listings:any;
@@ -20,14 +21,36 @@ const ListingsMap = ({listings}:Props) => {
   const onMarkerSelected = (event:any)=>{
         router.push(`/Listing/${event.properties.id}`)
   }
+ const renderCluster = (cluster:any) =>{
+       const {id,geometry,onPress,properties} = cluster;
+       const points = properties.point_count;
+
+       return (
+        <Marker key={`cluster-${id}`} 
+        onPress={onPress}
+        coordinate={{
+          longitude:geometry.coordinates[0],
+          latitude:geometry.coordinates[1]
+        }}
+        >
+         <View style={styles.marker}>
+          <Text style={{color:'#000',textAlign:'center',fontFamily:"MonSb"}}>
+            {points}
+          </Text>
+         </View>
+        </Marker>
+       )
+ }
+
   return (
-    <View style={styles.container}>
+    <View style={defaultStyles.container}>
       <MapView style={styles.map}
       animationEnabled={false}
       provider={PROVIDER_GOOGLE}
         initialRegion={INITIAL_REGION}
         clusterColor='#fff'
         clusterTextColor='#000'
+        renderCluster={renderCluster}
       >
         {listings.features.map((item:any)=>(
           <Marker 

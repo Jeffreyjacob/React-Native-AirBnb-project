@@ -6,6 +6,7 @@ import Listing from '@/components/Listing';
 import ListingData from '@/assets/data/airbnb-listings@public (4).json';
 import ListingsMap from '@/components/ListingsMap';
 import ListingDataGeo from '@/assets/data/airbnb-listings@public.geo.json';
+import ListingBottomSheet from '@/components/ListingBottomSheet';
 
 const Explore = () => {
   const [Category,setCategory] = useState('Tiny homes')
@@ -24,6 +25,7 @@ const geo = useMemo(()=>ListingDataGeo as any,[]);
       {/*<Listing listings={items} category={Category}/>*/}
 
       <ListingsMap listings={geo}/>
+      <ListingBottomSheet listing={items} category={Category}/>
     </View>
   )
 }

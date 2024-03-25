@@ -25,6 +25,13 @@ const Listing = ({listings:items,category}:Props) => {
       <FlatList 
       ref={listRef}
       data={loading? []: items}
+      ListHeaderComponent={<Text style={{
+        textAlign:"center",
+        fontFamily:'MonSb',
+        fontSize:16
+      }}>
+        {items.length} homes
+      </Text>}
       renderItem={({item})=>(
          <Link href={`/Listing/${item.id}`} asChild>
            <TouchableOpacity>
