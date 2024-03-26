@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
     },
     sheetContainer:{
     backgroundColor:'#fff',
-     borderRadius:10,
+     borderRadius:20,
      elevation:4,
      shadowColor:'#000',
      shadowOpacity:0.3,

@@ -18,7 +18,7 @@ const geo = useMemo(()=>ListingDataGeo as any,[]);
   }
 
   return (
-    <View style={{flex:1,marginTop:130}}>
+    <View style={{flex:1,marginTop:90}}>
       <Stack.Screen options={{
         header:()=><ExploreHeader onCategoryChanged={onDataChnaged}/>
       }}/>

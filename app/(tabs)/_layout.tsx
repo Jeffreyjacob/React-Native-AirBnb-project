@@ -28,6 +28,7 @@ const Layout = () => {
         tabBarIcon:({color,size})=> <MaterialCommunityIcons name="message-outline" size={size} color={color} />
        }}/> 
         <Tabs.Screen name='Profile' options={{
+          headerShown:false,
         tabBarLabel:'Profile',
         tabBarIcon:({color,size})=> <Ionicons name="person-circle-outline" size={size} color={color} />
        }}/> 
