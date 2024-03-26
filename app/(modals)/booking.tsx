@@ -11,7 +11,8 @@ const Booking = () => {
   const [openCard,SetOpenCard] = useState(0);
   const [selectedPlace,setSelectedPlace] = useState(0);
   const onClearAll = ()=>{
-
+     setSelectedPlace(0);
+     SetOpenCard(0);
   }
   return (
     <BlurView intensity={70} style={styles.container} tint='light'>
